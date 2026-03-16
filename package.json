@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "tsx src/index.ts"
+    "start": "tsx src/index.ts",
+    "drizzle": "tsx node_modules/drizzle-kit/bin.cjs",
+    "db:migrations:latest": "pnpm run drizzle push"
   },
   "type": "module",
   "keywords": [],
