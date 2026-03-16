@@ -5,6 +5,7 @@ import {
   type DbUserCreationData,
 } from "./infrastructure/database/schema/UsersTable.js";
 import { eq } from "drizzle-orm";
+import { MessagesTable } from "./infrastructure/database/schema/MessagesTable.js";
 
 const main = async () => {
   const db = drizzle({
@@ -15,6 +16,7 @@ const main = async () => {
       user: env.DATABASE_USER,
       password: env.DATABASE_PASSWORD,
     },
+    logger: true,
   });
 
   await db.execute("SELECT 1");
@@ -47,6 +49,19 @@ const main = async () => {
     .from(UsersTable)
     .where(eq(UsersTable.email, "henriqueinonhe@gmail.com"))
     .limit(1);
+
+  await db.insert(MessagesTable).values({
+    userId: result2[0]!.id,
+    text: "Duba duba",
+  });
+
+  const other = await db
+    .select()
+    .from(UsersTable)
+    .leftJoin(MessagesTable, eq(UsersTable.id, MessagesTable.userId))
+    .where(eq(UsersTable.email, "henriqueinonhe@gmail.com"));
+
+  console.log(other);
 
   console.log(result2[0]);
 
