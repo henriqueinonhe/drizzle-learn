@@ -4,6 +4,7 @@ import {
   UsersTable,
   type DbUserCreationData,
 } from "./infrastructure/database/schema/UsersTable.js";
+import { eq } from "drizzle-orm";
 
 const main = async () => {
   const db = drizzle({
@@ -18,17 +19,44 @@ const main = async () => {
 
   await db.execute("SELECT 1");
 
-  // const userCreationData: DbUserCreationData = {
-  //   name: "Dobbertons",
-  //   age: 23,
-  //   email: "henriqueinonhe@gmail.com",
-  // };
+  const userCreationData: DbUserCreationData = {
+    name: "Dobbertons",
+    age: 23,
+    email: "henriqueinonhe@gmail.com",
+  };
 
-  // await db.insert(UsersTable).values(userCreationData);
+  await db.insert(UsersTable).values(userCreationData);
 
-  const result = await db.select().from(UsersTable);
+  const result = await db
+    .select()
+    .from(UsersTable)
+    .where(eq(UsersTable.email, "henriqueinonhe@gmail.com"))
+    .limit(1);
 
-  console.log(result);
+  console.log(result[0]);
+
+  await db
+    .update(UsersTable)
+    .set({
+      age: 34,
+    })
+    .where(eq(UsersTable.email, "henriqueinonhe@gmail.com"));
+
+  const result2 = await db
+    .select()
+    .from(UsersTable)
+    .where(eq(UsersTable.email, "henriqueinonhe@gmail.com"))
+    .limit(1);
+
+  console.log(result2[0]);
+
+  await db
+    .delete(UsersTable)
+    .where(eq(UsersTable.email, "henriqueinonhe@gmail.com"));
+
+  const result3 = await db.$count(UsersTable);
+
+  console.log(result3);
 
   await db.$client.end();
 };
